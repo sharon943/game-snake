@@ -2,236 +2,206 @@
 <html lang="en">
 <head>
 	<meta charset="UTF-8">
-	<title>打字游戏</title>
+	<title>贪吃蛇游戏</title>
+	<script src="js.js"></script>
 	<style>
-	   body,html{
-	   	height: 100%;
-	   }
 		.box{
-			width: 1000px;
-			height: 100%;
-			border: 1px solid black;
-			margin: 0 auto;
+			width: 600px;
+			height: 600px;
+			border:1px solid #000;
+			margin:20px auto;
+			background: #fff;
 			position: relative;
-			background: url('08y58PICzEg.jpg') no-repeat center;
-			background-size: cover;
-
+			background: url('234.jpg') no-repeat center;
+			background-size: 500px 500px; 
 		}
-		.box img{
-			display: block;
-			position: absolute;
+		.box div{
+			width: 30px;
+			height: 30px;
+			float: left;
+			box-sizing: border-box;
 		}
-		.fenshu{
-			width: 60px;
-			height: 40px;
-			border: 1px solid black;
-			position: absolute;
-			left: -65px;
+		.she{
+			background: red;
+			border-radius: 10%;
+			border:1px solid #000;
+		}
+		.food{
+			background: yellow;
+			border:1px solid #000;
+			border-radius: 10%;
+		}
+		div.fenshu{
+			width: 120px;
+			height: 120px;
+			left: -150px;
 			top: 0;
-            color: green;
-            line-height: 40px;
-
-		}
-		.live{
-			width: 60px;
-			height: 40px;
-			border: 1px solid black;
+			text-align: center;
+			font-size: 30px;
+			color: #000;
+			line-height: 120px;
 			position: absolute;
-			top: 40px;
-			left: -65px;
-			color: red;
-			line-height: 40px;
-			margin-bottom: 20px;
+			border:1px solid #000;		
 		}
+		/* button{
+			width: 120px;
+			height: 50px;
+			position: fixed;
+			left: 50%;
+			margin-left: -450px;
+			top: 150px;
+
+		} */
 	</style>
 </head>
 <body>
 	<div class="box">
-		<div class="fenshu">0</div>
-		<div class="live">10</div>
+		<div class="fenshu">
+			0
+		</div>
 	</div>
+	<!-- <button>开始游戏</button> -->
 </body>
 </html>
-<script>
-function Game(){
-	this.arr=[
-	{value:"A",src:'A.png'},
-	{value:"B",src:'B.png'},
-	{value:"C",src:'C.png'},
-	{value:"D",src:'D.png'},
-	{value:"E",src:'E.png'},
-	{value:"F",src:'F.png'},
-	{value:"G",src:'G.png'},
-	{value:"H",src:'H.png'},
-	{value:"I",src:'I.png'},
-	{value:"J",src:'J.png'},
-	{value:"K",src:'K.png'},
-	{value:"L",src:'L.png'},
-	{value:"M",src:'M.png'},
-	{value:"N",src:'N.png'},
-	{value:"O",src:'O.png'},
-	{value:"P",src:'P.png'},
-	{value:"Q",src:'Q.png'},
-	{value:"R",src:'R.png'},
-	{value:"S",src:'S.png'},
-	{value:"T",src:'T.png'},
-	{value:"U",src:'U.png'},
-	{value:"V",src:'V.png'},
-	{value:"W",src:'W.png'},
-	{value:"X",src:'X.png'},
-	{value:"Y",src:'Y.png'},
-	{value:"Z",src:'Z.png'}
-	];
-	this.count=3;
-	this.currentArr=[];
-	// this.checkobj={};
-	this.box=document.querySelector('.box');
-	this.width=this.box.offsetWidth-53;
-	this.height=this.box.offsetHeight-77;
-	this.currentDom=[];
-	this.t='';
-	this.time=50;
-	this.speed=2;
-	this.live=10;
-	this.fenshu=0;
-	console.log(this.count,this.currentArr)
-
-}
-Game.prototype ={
-
-	getArr:function(){
-		while(this.currentArr.length<this.count){
-			var ran=Math.floor(Math.random()*this.arr.length);
-			var now=this.arr[ran];
-			if(!this.check(now)){
-				this.currentArr.push(this.arr[ran]);
-			}	
+<!-- <script>
+	// 棋盘的坐标思想
+	/*************游戏场景构造结束*************/
+	var box=document.querySelector('.box');
+	var str='';
+	for(var i=0;i<20;i++){
+		for(var j=0;j<20;j++){
+			str+=`<div id="c${j}-${i}"></div>`
 		}
-	},
-	check:function(obj){
-		return this.currentArr.some(function(val){
-			return val.value==obj.value;
-		})
-	},
-	getoneArr:function(){
+	}
+	box.innerHTML=str;
+
+	/*************游戏场景构造结束*************/
+
+	var she=[
+		{x:0,y:0},
+		{x:1,y:0},
+		{x:2,y:0},
+		{x:3,y:0}
+	]
+	/*************绘制蛇开始*************/
+
+	she.forEach( function(obj) {
+		var id='#c'+obj.x+'-'+obj.y;
+		var domobj=document.querySelector(id);
+		domobj.classList.add('she');
+	});
+
+	/*************绘制蛇结束*************/
+
+
+	/*************绘制食物开始*************/
+	var food=getfood();
+	function getfood(){
 		do{
-			var ran=Math.floor(Math.random()*this.arr.length);
-			var now=this.arr[ran];		
-		}while(this.check(now))
+			var x=Math.floor(Math.random()*20);
+			var y=Math.floor(Math.random()*20);
+		}while(check(x,y))//在蛇身上
 
-		this.currentArr.push(now);
+		
+		
+		
+		var foodobj=document.querySelector(`#c${x}-${y}`)
+		foodobj.classList.add('food');
+		return{x:x,y:y};
 
-
-		var img=document.createElement('img');
-		img.src=`A_Z/${now.src}`;
-		var left =Math.random()*this.width;
-		img.style.left=left+'px';
-		var tops =Math.random()*30;
-		img.style.top=tops+'px';
-		this.box.appendChild(img);
-		this.currentDom.push(img);
-		console.log(this.currentDom);
-
-
-	},
-	
-	drawimg:function(){
-		var self=this;
-		this.currentArr.forEach( function(obj) {
-			var img=document.createElement('img');
-			img.src=`A_Z/${obj.src}`;
-			var left =Math.random()*self.width;
-			img.style.left=left+'px';
-			var tops =Math.random()*100;
-			img.style.top=tops+'px';
-			self.box.appendChild(img);
-			self.currentDom.push(img);
-			console.log(self.currentDom);
-		});
-
-	},
-	move:function(){
-		// var img=this.box.children;
-		var self=this;
-		this.t=setInterval(function(){
-			for(var i=0;i<self.currentDom.length;i++){
-				var tops=self.currentDom[i].offsetTop;
-				var newtops=tops+self.speed;
-				if(newtops>=self.height){
-					self.box.removeChild(self.currentDom[i]);
-					self.currentArr.splice(i,1);
-					self.currentDom.splice(i,1);
-					self.live--;
-					document.querySelector('.live').innerHTML=self.live;
-					if(self.live<=0){
-						alert('Game over!');
-						clearInterval(self.t);
-						return;
-					}
-					self.getoneArr();
-				}else{
-					self.currentDom[i].style.top = newtops+"px";
-				}
-			}
-		},this.time)
-	},
-	
-	down:function(){
-		document.onkeydown=(e)=>{
-			var ma=e.keyCode;
-			var zimu=String.fromCharCode(ma);
-			console.log(zimu)
-			var index=this.currentArr.findIndex((value)=>{
-				return value.value==zimu;
+	}
+	function check(a,b){
+			return she.some(function(value){
+				console.log(value.x,value.y,a,b)
+				return value.x==a&&value.y==b;
 			})
-			if(index>-1){
-				this.box.removeChild(this.currentDom[index]);//从页面中移除掉
-				this.currentDom.splice(index,1);
-				this.currentArr.splice(index,1);
-				this.fenshu++;
-				console.log(this.fenshu)
-				if(this.fenshu==10){
-					this.nextbegin();
+		}
+	
+
+
+
+	she.forEach( function(obj) {
+		var id=`#c${obj.x}-${obj.y}`;
+		var domobj=document.querySelector(id);
+		domobj.classList.add('she');
+	});
+
+	/*************绘制食物结束*************/
+
+
+	/*************蛇动开始*************/
+	var t=setInterval(move,300);
+	var direction = 'r';
+	function move(){
+		var oldhead=she[she.length-1];
+		var newhead;
+		switch(direction){
+			case 'l':newhead={x:oldhead.x-1,y:oldhead.y};break;
+			case 'r':newhead={x:oldhead.x+1,y:oldhead.y};break;
+			case 'b':newhead={x:oldhead.x,y:oldhead.y+1};break;
+			case 't':newhead={x:oldhead.x,y:oldhead.y-1};break;
+		}
+		
+		var newheadobj=document.querySelector(`#c${newhead.x}-${newhead.y}`);
+		if(newheadobj==null||check(newhead.x,newhead.y)){
+			alert('Game over!');
+			clearInterval(t);
+			return;
+		}
+		// newheadobj.classList.add('she');
+		newheadobj.className='she';
+		she.push(newhead);
+
+		if(newhead.x==food.x&&newhead.y==food.y){
+			food=getfood();
+		}else{
+			var end=she.shift();
+			var endobj=document.querySelector(`#c${end.x}-${end.y}`)
+			endobj.classList.remove('she');
+		}
+		
+	}
+	
+	
+
+	document.onkeydown=function(e){
+		var code=e.keyCode;
+		switch (code) {
+			case 37:
+				if(direction == 'r'){
 					return;
 				}
-				if(this.fenshu==20){
-					this.nextbegin();
-					return
+				direction = 'l';
+				break;
+			case 38:
+				if(direction == 'b'){
+					return;
 				}
-				document.querySelector('.fenshu').innerHTML=this.fenshu;
-				this.getoneArr();
-
-			}
+				direction = 't';
+				break;
+			case 39:
+				if(direction == 'l'){
+					return;
+				}
+				direction = 'r';
+				break;
+			case 40:
+				if(direction == 't'){
+					return;
+				}
+				direction = 'b';
+				break;
+			
 		}
-	},
-	play:function(){
-		this.getArr();
-		this.drawimg();
-		this.move();
-		this.down();
-
-	},
-	nextbegin:function(){
-		clearInterval(this.t);
-		this.currentDom.forEach( (value)=> {
-			this.box.removeChild(value);
-		});
-		this.currentDom=[];
-		this.currentArr=[];
-
-		this.speed+=2;
-		this.time+=3;
-		this.count+=1;
-
-		this.getArr();
-		this.drawimg();
-		this.move();
 	}
-}
-window.onload=function(){
-	var newgame=new Game();
-	newgame.play();
+	
 
-}
 
-</script>
+
+
+
+	/*************蛇动结束*************/
+
+</script> -->
+
+
