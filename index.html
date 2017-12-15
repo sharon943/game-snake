@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>打字游戏</title>
+	<style>
+	   body,html{
+	   	height: 100%;
+	   }
+		.box{
+			width: 1000px;
+			height: 100%;
+			border: 1px solid black;
+			margin: 0 auto;
+			position: relative;
+			background: url('08y58PICzEg.jpg') no-repeat center;
+			background-size: cover;
+
+		}
+		.box img{
+			display: block;
+			position: absolute;
+		}
+		.fenshu{
+			width: 60px;
+			height: 40px;
+			border: 1px solid black;
+			position: absolute;
+			left: -65px;
+			top: 0;
+            color: green;
+            line-height: 40px;
+
+		}
+		.live{
+			width: 60px;
+			height: 40px;
+			border: 1px solid black;
+			position: absolute;
+			top: 40px;
+			left: -65px;
+			color: red;
+			line-height: 40px;
+			margin-bottom: 20px;
+		}
+	</style>
+</head>
+<body>
+	<div class="box">
+		<div class="fenshu">0</div>
+		<div class="live">10</div>
+	</div>
+</body>
+</html>
+<script>
+function Game(){
+	this.arr=[
+	{value:"A",src:'A.png'},
+	{value:"B",src:'B.png'},
+	{value:"C",src:'C.png'},
+	{value:"D",src:'D.png'},
+	{value:"E",src:'E.png'},
+	{value:"F",src:'F.png'},
+	{value:"G",src:'G.png'},
+	{value:"H",src:'H.png'},
+	{value:"I",src:'I.png'},
+	{value:"J",src:'J.png'},
+	{value:"K",src:'K.png'},
+	{value:"L",src:'L.png'},
+	{value:"M",src:'M.png'},
+	{value:"N",src:'N.png'},
+	{value:"O",src:'O.png'},
+	{value:"P",src:'P.png'},
+	{value:"Q",src:'Q.png'},
+	{value:"R",src:'R.png'},
+	{value:"S",src:'S.png'},
+	{value:"T",src:'T.png'},
+	{value:"U",src:'U.png'},
+	{value:"V",src:'V.png'},
+	{value:"W",src:'W.png'},
+	{value:"X",src:'X.png'},
+	{value:"Y",src:'Y.png'},
+	{value:"Z",src:'Z.png'}
+	];
+	this.count=3;
+	this.currentArr=[];
+	// this.checkobj={};
+	this.box=document.querySelector('.box');
+	this.width=this.box.offsetWidth-53;
+	this.height=this.box.offsetHeight-77;
+	this.currentDom=[];
+	this.t='';
+	this.time=50;
+	this.speed=2;
+	this.live=10;
+	this.fenshu=0;
+	console.log(this.count,this.currentArr)
+
+}
+Game.prototype ={
+
+	getArr:function(){
+		while(this.currentArr.length<this.count){
+			var ran=Math.floor(Math.random()*this.arr.length);
+			var now=this.arr[ran];
+			if(!this.check(now)){
+				this.currentArr.push(this.arr[ran]);
+			}	
+		}
+	},
+	check:function(obj){
+		return this.currentArr.some(function(val){
+			return val.value==obj.value;
+		})
+	},
+	getoneArr:function(){
+		do{
+			var ran=Math.floor(Math.random()*this.arr.length);
+			var now=this.arr[ran];		
+		}while(this.check(now))
+
+		this.currentArr.push(now);
+
+
+		var img=document.createElement('img');
+		img.src=`A_Z/${now.src}`;
+		var left =Math.random()*this.width;
+		img.style.left=left+'px';
+		var tops =Math.random()*30;
+		img.style.top=tops+'px';
+		this.box.appendChild(img);
+		this.currentDom.push(img);
+		console.log(this.currentDom);
+
+
+	},
+	
+	drawimg:function(){
+		var self=this;
+		this.currentArr.forEach( function(obj) {
+			var img=document.createElement('img');
+			img.src=`A_Z/${obj.src}`;
+			var left =Math.random()*self.width;
+			img.style.left=left+'px';
+			var tops =Math.random()*100;
+			img.style.top=tops+'px';
+			self.box.appendChild(img);
+			self.currentDom.push(img);
+			console.log(self.currentDom);
+		});
+
+	},
+	move:function(){
+		// var img=this.box.children;
+		var self=this;
+		this.t=setInterval(function(){
+			for(var i=0;i<self.currentDom.length;i++){
+				var tops=self.currentDom[i].offsetTop;
+				var newtops=tops+self.speed;
+				if(newtops>=self.height){
+					self.box.removeChild(self.currentDom[i]);
+					self.currentArr.splice(i,1);
+					self.currentDom.splice(i,1);
+					self.live--;
+					document.querySelector('.live').innerHTML=self.live;
+					if(self.live<=0){
+						alert('Game over!');
+						clearInterval(self.t);
+						return;
+					}
+					self.getoneArr();
+				}else{
+					self.currentDom[i].style.top = newtops+"px";
+				}
+			}
+		},this.time)
+	},
+	
+	down:function(){
+		document.onkeydown=(e)=>{
+			var ma=e.keyCode;
+			var zimu=String.fromCharCode(ma);
+			console.log(zimu)
+			var index=this.currentArr.findIndex((value)=>{
+				return value.value==zimu;
+			})
+			if(index>-1){
+				this.box.removeChild(this.currentDom[index]);//从页面中移除掉
+				this.currentDom.splice(index,1);
+				this.currentArr.splice(index,1);
+				this.fenshu++;
+				console.log(this.fenshu)
+				if(this.fenshu==10){
+					this.nextbegin();
+					return;
+				}
+				if(this.fenshu==20){
+					this.nextbegin();
+					return
+				}
+				document.querySelector('.fenshu').innerHTML=this.fenshu;
+				this.getoneArr();
+
+			}
+		}
+	},
+	play:function(){
+		this.getArr();
+		this.drawimg();
+		this.move();
+		this.down();
+
+	},
+	nextbegin:function(){
+		clearInterval(this.t);
+		this.currentDom.forEach( (value)=> {
+			this.box.removeChild(value);
+		});
+		this.currentDom=[];
+		this.currentArr=[];
+
+		this.speed+=2;
+		this.time+=3;
+		this.count+=1;
+
+		this.getArr();
+		this.drawimg();
+		this.move();
+	}
+}
+window.onload=function(){
+	var newgame=new Game();
+	newgame.play();
+
+}
+
+</script>
